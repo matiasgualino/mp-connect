@@ -17,8 +17,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        appId = "1440117086771094";
-        redirectUri = "www.mercadopago.com.ar";
+        //appId de mromar
+        //appId = "1440117086771094";
+        //etorres
+        appId = "3339632528347950";
+        redirectUri = "https://www.mercadopago.com.ar";
+
+
 
         Intent intent = new Intent(this, MPConnectActivity.class);
         intent.putExtra("appId", appId);
