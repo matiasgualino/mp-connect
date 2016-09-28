@@ -10,7 +10,7 @@ import retrofit2.http.POST;
 /**
  * Created by mromar on 9/26/16.
  */
-public interface MPService {
+public interface PrivateKeyService {
 
     @POST("/checkout/get_credentials")
     Call<AccessToken> getPrivateKey(@Body AuthCodeIntent authCodeIntent);

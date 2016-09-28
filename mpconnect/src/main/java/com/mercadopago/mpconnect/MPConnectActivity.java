@@ -1,7 +1,7 @@
 package com.mercadopago.mpconnect;
 
 import android.app.Activity;
-import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.mercadopago.mpconnect.model.AccessToken;
 import com.mercadopago.mpconnect.model.AuthCodeIntent;
-import com.mercadopago.mpconnect.services.MPService;
+import com.mercadopago.mpconnect.services.PrivateKeyService;
 import com.mercadopago.mpconnect.util.HttpClientUtil;
 
 import retrofit2.Call;
@@ -121,7 +121,7 @@ public class MPConnectActivity extends AppCompatActivity {
                 .baseUrl(BASE_URL)
                 .build();
 
-        MPService service = retrofitBuilder.create(MPService.class);
+        PrivateKeyService service = retrofitBuilder.create(PrivateKeyService.class);
 
         Call<AccessToken> call = service.getPrivateKey(authCodeIntent);
         call.enqueue(new Callback<AccessToken>() {
@@ -133,7 +133,7 @@ public class MPConnectActivity extends AppCompatActivity {
                 else if (response.code() == 200) {
                     mAccessToken = response.body();
                     Toast.makeText(MPConnectActivity.this, "AccessToken: " + mAccessToken.getAccessToken(), Toast.LENGTH_SHORT).show();
-                    finish();
+                    finishWithResult();
                 }
             }
 
@@ -142,6 +142,13 @@ public class MPConnectActivity extends AppCompatActivity {
                 Log.e("Failure","Service failure");
             }
         });
-
     }
+
+    private void finishWithResult() {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("accessToken",mAccessToken.getAccessToken());
+        setResult(RESULT_OK, resultIntent);
+        finish();
+    }
+
 }

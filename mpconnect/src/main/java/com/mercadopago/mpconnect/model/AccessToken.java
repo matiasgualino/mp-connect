@@ -8,28 +8,28 @@ import com.google.gson.annotations.SerializedName;
 public class AccessToken {
 
     @SerializedName("access_token")
-    public String mAccessToken;
+    private String mAccessToken;
 
     @SerializedName("public_key")
-    public String mPublicKey;
+    private String mPublicKey;
 
     @SerializedName("refresh_token")
-    public String mRefreshToken;
+    private String mRefreshToken;
 
     @SerializedName("live_mode")
-    public Boolean mLiveMode;
+    private Boolean mLiveMode;
 
     @SerializedName("user_id")
-    public Long mUserId;
+    private Long mUserId;
 
     @SerializedName("token_type")
-    public String mTokenType;
+    private String mTokenType;
 
     @SerializedName("expires_in")
-    public Long mExpiresIn;
+    private Long mExpiresIn;
 
     @SerializedName("scope")
-    public String mScope;
+    private String mScope;
 
     public String getAccessToken(){
         return this.mAccessToken;
@@ -43,5 +43,23 @@ public class AccessToken {
         return this.mRefreshToken;
     }
 
+    public Boolean getLiveMode() {
+        return this.mLiveMode;
+    }
 
+    public Long getUserId() {
+        return this.mUserId;
+    }
+
+    public String getTokenType() {
+        return this.mTokenType;
+    }
+
+    public Long getExpiresIn() {
+        return this.mExpiresIn;
+    }
+
+    public String getScope() {
+        return this.mScope;
+    }
 }
