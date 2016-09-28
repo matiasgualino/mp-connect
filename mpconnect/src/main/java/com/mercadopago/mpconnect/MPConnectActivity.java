@@ -1,30 +1,41 @@
 package com.mercadopago.mpconnect;
 
 import android.app.Activity;
-import android.content.Intent;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
+import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
+
+import com.mercadopago.mpconnect.model.AccessToken;
+import com.mercadopago.mpconnect.model.AuthCodeIntent;
+import com.mercadopago.mpconnect.services.MPService;
+import com.mercadopago.mpconnect.util.HttpClientUtil;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MPConnectActivity extends AppCompatActivity {
 
     private WebView mWebView;
     private String mAppId;
     private String mRedirectUri;
-    //TODO mejorar
 
-    private String mUrl = "https://www.mercadopago.com.ar?code=";
-    //private static final String MP_API_BASE_URL = "https://api.mercadopago.com";
-    //private static final String BASE_URL = "https://api.mercadopago.com/";
+    //TODO mejorar
+    private String mAuthCode;
+    private String mUrl = "https://www.mercadopago.com.ar/?code=";
+    private static final String BASE_URL = "http://mpconnect-wrapper.herokuapp.com/";
+    private AccessToken mAccessToken;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -35,7 +46,6 @@ public class MPConnectActivity extends AppCompatActivity {
         mRedirectUri = getIntent().getStringExtra("redirectUri");
 
         mWebView = (WebView) findViewById(R.id.webViewLib);
-
 
         mWebView.setWebViewClient(new OAuthWebViewClient(this));
         WebSettings webSettings = mWebView.getSettings();
@@ -64,8 +74,7 @@ public class MPConnectActivity extends AppCompatActivity {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             if (url.contains(mUrl)) {
-                //TODO agarrar código
-                Toast.makeText(MPConnectActivity.this, "Hola!", Toast.LENGTH_SHORT).show();
+                setAuthCode(url);
                 getPrivateKey();
                 current.finish();
                 return true;
@@ -96,8 +105,17 @@ public class MPConnectActivity extends AppCompatActivity {
 
     }
 
+    private void setAuthCode(String url){
+        mAuthCode = url.substring(url.lastIndexOf("=")+1);
+        Toast.makeText(MPConnectActivity.this, "AuthCode: " + mAuthCode, Toast.LENGTH_SHORT).show();
+    }
+
     private void getPrivateKey() {
-        /*Retrofit retrofitBuilder = new Retrofit.Builder()
+        AuthCodeIntent authCodeIntent = new AuthCodeIntent();
+        authCodeIntent.setAuthorizationCode(mAuthCode);
+        authCodeIntent.setRedirectUri(mRedirectUri);
+
+        Retrofit retrofitBuilder = new Retrofit.Builder()
                 .client(HttpClientUtil.getClient(this))
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl(BASE_URL)
@@ -105,21 +123,25 @@ public class MPConnectActivity extends AppCompatActivity {
 
         MPService service = retrofitBuilder.create(MPService.class);
 
-        Call<String> call = service.getPrivateKey(mPublicKey, mAuthoriztionCode);
-
-        /*call.enqueue(new Callback<Void>() {
+        Call<AccessToken> call = service.getPrivateKey(authCodeIntent);
+        call.enqueue(new Callback<AccessToken>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
                 if(response.code() == 400) {
                     Log.e("Failure","Error 400, parameter invalid");
+                }
+                else if (response.code() == 200) {
+                    mAccessToken = response.body();
+                    Toast.makeText(MPConnectActivity.this, "AccessToken: " + mAccessToken.getAccessToken(), Toast.LENGTH_SHORT).show();
+                    finish();
                 }
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(Call<AccessToken> call, Throwable t) {
                 Log.e("Failure","Service failure");
             }
         });
-        */
+
     }
 }
