@@ -142,6 +142,9 @@ public class MPConnectActivity extends AppCompatActivity {
                     mAccessToken = response.body();
                     finishWithResult();
                 }
+                else {
+                    finishWithResult();
+                }
             }
 
             @Override
