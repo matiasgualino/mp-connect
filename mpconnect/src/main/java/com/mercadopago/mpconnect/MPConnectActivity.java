@@ -27,25 +27,29 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MPConnectActivity extends AppCompatActivity {
 
-    private WebView mWebView;
+    //Parameters
     private String mAppId;
     private String mRedirectUri;
 
-    //TODO mejorar
+    //Control
+    private WebView mWebView;
+
+    //Local
+    public static final int CONNECT_REQUEST_CODE = 0;
+    private static final String mUrl = "https://www.mercadopago.com.ar/?code=";
     private String mAuthCode;
-    private String mUrl = "https://www.mercadopago.com.ar/?code=";
-    private static final String BASE_URL = "http://mpconnect-wrapper.herokuapp.com/";
     private AccessToken mAccessToken;
+
+    //Service
+    private static final String BASE_URL = "http://mpconnect-wrapper.herokuapp.com/";
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mpconnect);
 
-        mAppId = getIntent().getStringExtra("appId");
-        mRedirectUri = getIntent().getStringExtra("redirectUri");
-
-        mWebView = (WebView) findViewById(R.id.webViewLib);
+        getParameters();
+        initializeControl();
 
         mWebView.setWebViewClient(new OAuthWebViewClient(this));
         WebSettings webSettings = mWebView.getSettings();
@@ -86,23 +90,26 @@ public class MPConnectActivity extends AppCompatActivity {
         public void onReceivedError(WebView view, int errorCode,
                                     String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
-            //onFailure(current, String.valueOf(errorCode), description, null);
         }
 
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
-//            isPageLoading = Boolean.TRUE;
-//            progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
-//            isPageLoading = Boolean.FALSE;
-//            progressBar.setVisibility(View.GONE);
         }
+    }
 
+    private void getParameters(){
+        mAppId = getIntent().getStringExtra("appId");
+        mRedirectUri = getIntent().getStringExtra("redirectUri");
+    }
+
+    private void initializeControl() {
+        mWebView = (WebView) findViewById(R.id.webViewLib);
     }
 
     private void setAuthCode(String url){
@@ -129,10 +136,10 @@ public class MPConnectActivity extends AppCompatActivity {
             public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
                 if(response.code() == 400) {
                     Log.e("Failure","Error 400, parameter invalid");
+                    finishWithCancelResult();
                 }
                 else if (response.code() == 200) {
                     mAccessToken = response.body();
-                    Toast.makeText(MPConnectActivity.this, "AccessToken: " + mAccessToken.getAccessToken(), Toast.LENGTH_SHORT).show();
                     finishWithResult();
                 }
             }
@@ -140,6 +147,7 @@ public class MPConnectActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<AccessToken> call, Throwable t) {
                 Log.e("Failure","Service failure");
+                finishWithCancelResult();
             }
         });
     }
@@ -147,8 +155,13 @@ public class MPConnectActivity extends AppCompatActivity {
     private void finishWithResult() {
         Intent resultIntent = new Intent();
         resultIntent.putExtra("accessToken",mAccessToken.getAccessToken());
-        setResult(RESULT_OK, resultIntent);
-        finish();
+        this.setResult(RESULT_OK, resultIntent);
+        this.finish();
+    }
+
+    private void finishWithCancelResult() {
+        this.setResult(RESULT_CANCELED);
+        this.finish();
     }
 
 }
