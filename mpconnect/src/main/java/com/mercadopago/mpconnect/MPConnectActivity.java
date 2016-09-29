@@ -143,7 +143,7 @@ public class MPConnectActivity extends AppCompatActivity {
                     finishWithResult();
                 }
                 else {
-                    finishWithResult();
+                    finishWithCancelResult();
                 }
             }
 
