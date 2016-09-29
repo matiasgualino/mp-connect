@@ -21,7 +21,8 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MPConnectActivity.class);
         intent.putExtra("appId", mAppId);
         intent.putExtra("redirectUri", mRedirectUri);
-        startActivity(intent);
+        //startActivity(intent);
+        this.startActivityForResult(intent, MPConnectActivity.CONNECT_REQUEST_CODE);
     }
 
     @Override
