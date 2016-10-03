@@ -14,7 +14,7 @@ public class AuthCodeIntent {
     private String mRedirectUri;
 
     @SerializedName("user_id_access_token")
-    private String mUserIdAccessToken;
+    private String mUserIdentificationToken;
 
     public void setAuthorizationCode(String authorizationCode){
         this.mAuthorizationCode = authorizationCode;
@@ -24,7 +24,7 @@ public class AuthCodeIntent {
         this.mRedirectUri = redirectUri;
     }
 
-    public void setUserIdAccessToken(String userIdAccessToken){
-        this.mUserIdAccessToken = userIdAccessToken;
+    public void setUserIdentificationToken(String userIdentificationToken){
+        this.mUserIdentificationToken = userIdentificationToken;
     }
 }

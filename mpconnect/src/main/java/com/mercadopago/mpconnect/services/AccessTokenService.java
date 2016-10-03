@@ -11,8 +11,8 @@ import retrofit2.http.Path;
 /**
  * Created by mromar on 9/26/16.
  */
-public interface PrivateKeyService {
+public interface AccessTokenService {
 
     @POST("/{uri}")
-    Call<AccessToken> getPrivateKey(@Path(value = "uri", encoded = true) String uri, @Body AuthCodeIntent authCodeIntent);
+    Call<AccessToken> getAccessToken(@Path(value = "uri", encoded = true) String uri, @Body AuthCodeIntent authCodeIntent);
 }

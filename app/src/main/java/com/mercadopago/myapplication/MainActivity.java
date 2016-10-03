@@ -1,11 +1,10 @@
 package com.mercadopago.myapplication;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import com.mercadopago.mpconnect.ConnectActivity;
 import com.mercadopago.mpconnect.MPConnect;
 
 public class MainActivity extends AppCompatActivity {
@@ -19,8 +18,8 @@ public class MainActivity extends AppCompatActivity {
                 .setActivity(this)
                 .setAppId("3339632528347950")
                 .setMerchantBaseUrl("http://mpconnect-wrapper.herokuapp.com/")
-                .setMerchantUri("checkout/get_credentials")
-                .setUserIdToken("123456789")
+                .setMerchantGetCredentialsUri("checkout/get_credentials")
+                .setUserIdentificationToken("123456789")
                 .startConnectActivity();
     }
 
@@ -30,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == MPConnect.CONNECT_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                accessToken = this.getIntent().getStringExtra("accessToken");
+                accessToken = data.getStringExtra("accessToken");
                 Toast.makeText(MainActivity.this, "AccessToken: " + accessToken, Toast.LENGTH_SHORT).show();
                 this.finish();
             } else {

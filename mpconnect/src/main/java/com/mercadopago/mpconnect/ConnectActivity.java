@@ -1,22 +1,19 @@
 package com.mercadopago.mpconnect;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
 
 import com.mercadopago.mpconnect.model.AccessToken;
 import com.mercadopago.mpconnect.model.AuthCodeIntent;
-import com.mercadopago.mpconnect.services.PrivateKeyService;
+import com.mercadopago.mpconnect.services.AccessTokenService;
 import com.mercadopago.mpconnect.util.HttpClientUtil;
 
 import retrofit2.Call;
@@ -39,8 +36,8 @@ public class ConnectActivity extends AppCompatActivity {
     //Parameters
     private String mAppId;
     private String mMerchantBaseUrl;
-    private String mMerchantUri;
-    private String mUserIdToken;
+    private String mMerchantGetCredentialsUri;
+    private String mUserIdentificationToken;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -50,7 +47,18 @@ public class ConnectActivity extends AppCompatActivity {
         getActivityParameters();
         initializeWebView();
 
-        mWebView.setWebViewClient(new OAuthWebViewClient(this));
+        mWebView.setWebViewClient(new WebViewClient(){
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url.contains(mUrl)) {
+                    setAuthCode(url);
+                    getPrivateKey();
+                    return true;
+                }
+                return false;
+            }
+        });
+
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         CookieSyncManager.createInstance(this);
@@ -67,47 +75,12 @@ public class ConnectActivity extends AppCompatActivity {
         mWebView.clearCache(true);
     }
 
-    private class OAuthWebViewClient extends WebViewClient {
-        private Activity current;
-
-        public OAuthWebViewClient(Activity current) {
-            this.current = current;
-        }
-
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if (url.contains(mUrl)) {
-                setAuthCode(url);
-                getPrivateKey();
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public void onReceivedError(WebView view, int errorCode,
-                                    String description, String failingUrl) {
-            super.onReceivedError(view, errorCode, description, failingUrl);
-        }
-
-        @Override
-        public void onPageStarted(WebView view, String url, Bitmap favicon) {
-            super.onPageStarted(view, url, favicon);
-        }
-
-        @Override
-        public void onPageFinished(WebView view, String url) {
-            super.onPageFinished(view, url);
-        }
-    }
-
     private void initializeWebView() {
         mWebView = (WebView) findViewById(R.id.webViewLib);
     }
 
     private void setAuthCode(String url){
         mAuthCode = url.substring(url.lastIndexOf("=")+1);
-        Toast.makeText(ConnectActivity.this, "AuthCode: " + mAuthCode, Toast.LENGTH_SHORT).show();
     }
 
     private void getPrivateKey() {
@@ -119,9 +92,9 @@ public class ConnectActivity extends AppCompatActivity {
                 .baseUrl(mMerchantBaseUrl)
                 .build();
 
-        PrivateKeyService service = retrofitBuilder.create(PrivateKeyService.class);
+        AccessTokenService service = retrofitBuilder.create(AccessTokenService.class);
 
-        Call<AccessToken> call = service.getPrivateKey(mMerchantUri, authCodeIntent);
+        Call<AccessToken> call = service.getAccessToken(mMerchantGetCredentialsUri, authCodeIntent);
         call.enqueue(new Callback<AccessToken>() {
             @Override
             public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
@@ -129,7 +102,7 @@ public class ConnectActivity extends AppCompatActivity {
                     Log.e("Failure","Error 400, parameter invalid");
                     finishWithCancelResult();
                 }
-                else if (response.code() == 200) {
+                else if (response.code() >= 200 && response.code() <= 300) {
                     mAccessToken = response.body();
                     finishWithResult();
                 }
@@ -150,7 +123,7 @@ public class ConnectActivity extends AppCompatActivity {
         AuthCodeIntent authCodeIntent = new AuthCodeIntent();
         authCodeIntent.setAuthorizationCode(mAuthCode);
         authCodeIntent.setRedirectUri(mRedirectUri);
-        authCodeIntent.setUserIdAccessToken(mUserIdToken);
+        authCodeIntent.setUserIdentificationToken(mUserIdentificationToken);
 
         return authCodeIntent;
     }
@@ -158,13 +131,11 @@ public class ConnectActivity extends AppCompatActivity {
     private void getActivityParameters(){
         mAppId = getIntent().getStringExtra("appId");
         mMerchantBaseUrl = getIntent().getStringExtra("merchantBaseUrl");
-        mMerchantUri = getIntent().getStringExtra("merchantUri");
-        mUserIdToken = getIntent().getStringExtra("userIdToken");
+        mMerchantGetCredentialsUri = getIntent().getStringExtra("merchantGetCredentialsUri");
+        mUserIdentificationToken = getIntent().getStringExtra("userIdentificationToken");
     }
 
     private void finishWithResult() {
-        Toast.makeText(ConnectActivity.this, "AccessToken " + mAccessToken.getAccessToken(), Toast.LENGTH_SHORT).show();
-
         Intent resultIntent = new Intent();
         resultIntent.putExtra("accessToken",mAccessToken.getAccessToken());
         this.setResult(RESULT_OK, resultIntent);

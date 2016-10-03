@@ -3,6 +3,8 @@ package com.mercadopago.mpconnect;
 import android.app.Activity;
 import android.content.Intent;
 
+import static android.text.TextUtils.isEmpty;
+
 /**
  * Created by mromar on 10/3/16.
  */
@@ -10,14 +12,14 @@ public class MPConnect {
 
     public static final int CONNECT_REQUEST_CODE = 0;
 
-    private static void startConnectActivity(Activity activity, String appId, String merchantBaseUrl, String merchantUri, String userIdToken){
+    private static void startConnectActivity(Activity activity, String appId, String merchantBaseUrl, String merchantGetCredentialsUri, String userIdentificationToken){
 
         Intent connectIntent = new Intent(activity, ConnectActivity.class);
         connectIntent.putExtra("appId", appId);
 
         connectIntent.putExtra("merchantBaseUrl", merchantBaseUrl);
-        connectIntent.putExtra("merchantUri", merchantUri);
-        connectIntent.putExtra("userIdToken", userIdToken);
+        connectIntent.putExtra("merchantGetCredentialsUri", merchantGetCredentialsUri);
+        connectIntent.putExtra("userIdentificationToken", userIdentificationToken);
 
         activity.startActivityForResult(connectIntent, CONNECT_REQUEST_CODE);
     }
@@ -26,8 +28,8 @@ public class MPConnect {
         private Activity mActivity;
         private String mAppId;
         private String mMerchantBaseUrl;
-        private String mMerchantUri;
-        private String mUserIdToken;
+        private String mMerchantGetCredentialsUri;
+        private String mUserIdentificationToken;
 
         public StartActivityBuilder setActivity(Activity activity){
             this.mActivity = activity;
@@ -39,13 +41,13 @@ public class MPConnect {
             return this;
         }
 
-        public StartActivityBuilder setUserIdToken(String userIdToken){
-            this.mUserIdToken = userIdToken;
+        public StartActivityBuilder setUserIdentificationToken(String userIdentificationToken){
+            this.mUserIdentificationToken = userIdentificationToken;
             return this;
         }
 
-        public StartActivityBuilder setMerchantUri(String merchantUri){
-            this.mMerchantUri = merchantUri;
+        public StartActivityBuilder setMerchantGetCredentialsUri(String merchantGetCredentialsUri){
+            this.mMerchantGetCredentialsUri = merchantGetCredentialsUri;
             return this;
         }
 
@@ -56,12 +58,11 @@ public class MPConnect {
 
         public void startConnectActivity(){
             if (this.mActivity == null) throw new IllegalStateException("activity is null");
-            if (this.mAppId == null) throw new IllegalStateException("app id is null");
-            if (this.mMerchantBaseUrl == null) throw new IllegalStateException("base url is null");
-            if (this.mMerchantUri == null) throw new IllegalStateException("uri is null");
+            if (isEmpty(this.mAppId)) throw new IllegalStateException("app id is null or empty");
+            if (isEmpty(this.mMerchantBaseUrl)) throw new IllegalStateException("base url is null or empty");
+            if (isEmpty(this.mMerchantGetCredentialsUri)) throw new IllegalStateException("uri is null or empty");
 
-
-            MPConnect.startConnectActivity(this.mActivity, this.mAppId, this.mMerchantBaseUrl, this.mMerchantUri, this.mUserIdToken);
+            MPConnect.startConnectActivity(this.mActivity, this.mAppId, this.mMerchantBaseUrl, this.mMerchantGetCredentialsUri, this.mUserIdentificationToken);
         }
     }
 }
