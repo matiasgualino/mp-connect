@@ -12,6 +12,15 @@ public class MPConnect {
 
     public static final int CONNECT_REQUEST_CODE = 0;
 
+    /**
+     * Start the ConnectActivity
+     *
+     * @param activity                  Reference to Android Context. Cannot be {@code null or empty}.
+     * @param appId                     The app identification of the merchant in Mercado Pago. {@code null or empty}.
+     * @param merchantBaseUrl           The merchant base url for where ask the access token of the user. {@code null or empty}.
+     * @param merchantGetCredentialsUri The merchant uri where get the credentials. {@code null or empty}.
+     * @param userIdentificationToken   The user identification asociate with an access token. Can be {@code null or empty}.
+     */
     private static void startConnectActivity(Activity activity, String appId, String merchantBaseUrl, String merchantGetCredentialsUri, String userIdentificationToken){
 
         Intent connectIntent = new Intent(activity, ConnectActivity.class);
@@ -56,6 +65,9 @@ public class MPConnect {
             return this;
         }
 
+        /**
+         * Validate the parameters and start connect activity
+         **/
         public void startConnectActivity(){
             if (this.mActivity == null) throw new IllegalStateException("activity is null");
             if (isEmpty(this.mAppId)) throw new IllegalStateException("app id is null or empty");
