@@ -6,12 +6,13 @@ import com.mercadopago.mpconnect.model.AuthCodeIntent;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 /**
  * Created by mromar on 9/26/16.
  */
 public interface PrivateKeyService {
 
-    @POST("/checkout/get_credentials")
-    Call<AccessToken> getPrivateKey(@Body AuthCodeIntent authCodeIntent);
+    @POST("/{uri}")
+    Call<AccessToken> getPrivateKey(@Path(value = "uri", encoded = true) String uri, @Body AuthCodeIntent authCodeIntent);
 }

@@ -25,31 +25,30 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MPConnectActivity extends AppCompatActivity {
-
-    //Parameters
-    private String mAppId;
-    private String mRedirectUri;
+public class ConnectActivity extends AppCompatActivity {
 
     //Control
     private WebView mWebView;
 
-    //Local
-    public static final int CONNECT_REQUEST_CODE = 0;
+    //Local Ver Connect Mercado Pago
     private static final String mUrl = "https://www.mercadopago.com.ar/?code=";
+    private static final String mRedirectUri = "https://www.mercadopago.com.ar";
     private String mAuthCode;
     private AccessToken mAccessToken;
 
-    //Service
-    private static final String BASE_URL = "http://mpconnect-wrapper.herokuapp.com/";
+    //Parameters
+    private String mAppId;
+    private String mMerchantBaseUrl;
+    private String mMerchantUri;
+    private String mUserIdToken;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mpconnect);
 
-        getParameters();
-        initializeControl();
+        getActivityParameters();
+        initializeWebView();
 
         mWebView.setWebViewClient(new OAuthWebViewClient(this));
         WebSettings webSettings = mWebView.getSettings();
@@ -57,7 +56,7 @@ public class MPConnectActivity extends AppCompatActivity {
         CookieSyncManager.createInstance(this);
         CookieManager cookieManager = CookieManager.getInstance();
 
-        //FIX LOLLIPOP WEBVIEW CHROME HTTPS (UNSECURE MIXED CONTENT)
+        //Fix Lollipop webview Chrome HTTPS (unsecure mixed content)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
             cookieManager.setAcceptThirdPartyCookies(mWebView, true);
@@ -80,7 +79,6 @@ public class MPConnectActivity extends AppCompatActivity {
             if (url.contains(mUrl)) {
                 setAuthCode(url);
                 getPrivateKey();
-                current.finish();
                 return true;
             }
             return false;
@@ -103,34 +101,27 @@ public class MPConnectActivity extends AppCompatActivity {
         }
     }
 
-    private void getParameters(){
-        mAppId = getIntent().getStringExtra("appId");
-        mRedirectUri = getIntent().getStringExtra("redirectUri");
-    }
-
-    private void initializeControl() {
+    private void initializeWebView() {
         mWebView = (WebView) findViewById(R.id.webViewLib);
     }
 
     private void setAuthCode(String url){
         mAuthCode = url.substring(url.lastIndexOf("=")+1);
-        Toast.makeText(MPConnectActivity.this, "AuthCode: " + mAuthCode, Toast.LENGTH_SHORT).show();
+        Toast.makeText(ConnectActivity.this, "AuthCode: " + mAuthCode, Toast.LENGTH_SHORT).show();
     }
 
     private void getPrivateKey() {
-        AuthCodeIntent authCodeIntent = new AuthCodeIntent();
-        authCodeIntent.setAuthorizationCode(mAuthCode);
-        authCodeIntent.setRedirectUri(mRedirectUri);
+        AuthCodeIntent authCodeIntent = createAuthCodeIntent();
 
         Retrofit retrofitBuilder = new Retrofit.Builder()
                 .client(HttpClientUtil.getClient(this))
                 .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl(BASE_URL)
+                .baseUrl(mMerchantBaseUrl)
                 .build();
 
         PrivateKeyService service = retrofitBuilder.create(PrivateKeyService.class);
 
-        Call<AccessToken> call = service.getPrivateKey(authCodeIntent);
+        Call<AccessToken> call = service.getPrivateKey(mMerchantUri, authCodeIntent);
         call.enqueue(new Callback<AccessToken>() {
             @Override
             public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
@@ -155,7 +146,25 @@ public class MPConnectActivity extends AppCompatActivity {
         });
     }
 
+    private AuthCodeIntent createAuthCodeIntent(){
+        AuthCodeIntent authCodeIntent = new AuthCodeIntent();
+        authCodeIntent.setAuthorizationCode(mAuthCode);
+        authCodeIntent.setRedirectUri(mRedirectUri);
+        authCodeIntent.setUserIdAccessToken(mUserIdToken);
+
+        return authCodeIntent;
+    }
+
+    private void getActivityParameters(){
+        mAppId = getIntent().getStringExtra("appId");
+        mMerchantBaseUrl = getIntent().getStringExtra("merchantBaseUrl");
+        mMerchantUri = getIntent().getStringExtra("merchantUri");
+        mUserIdToken = getIntent().getStringExtra("userIdToken");
+    }
+
     private void finishWithResult() {
+        Toast.makeText(ConnectActivity.this, "AccessToken " + mAccessToken.getAccessToken(), Toast.LENGTH_SHORT).show();
+
         Intent resultIntent = new Intent();
         resultIntent.putExtra("accessToken",mAccessToken.getAccessToken());
         this.setResult(RESULT_OK, resultIntent);
@@ -166,5 +175,4 @@ public class MPConnectActivity extends AppCompatActivity {
         this.setResult(RESULT_CANCELED);
         this.finish();
     }
-
 }
