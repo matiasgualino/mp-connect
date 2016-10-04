@@ -13,13 +13,13 @@ public class MPConnect {
     public static final int CONNECT_REQUEST_CODE = 0;
 
     /**
-     * Start the ConnectActivity
+     * Start the web view for log in to Mercado Pago account and get its access token.
      *
-     * @param activity                  Reference to Android Context. Cannot be {@code null or empty}.
-     * @param appId                     The app identification of the merchant in Mercado Pago. {@code null or empty}.
-     * @param merchantBaseUrl           The merchant base url for where ask the access token of the user. {@code null or empty}.
-     * @param merchantGetCredentialsUri The merchant uri where get the credentials. {@code null or empty}.
-     * @param userIdentificationToken   The user identification asociate with an access token. Can be {@code null or empty}.
+     * @param activity                  Reference to Android Context. Can not be null or empty.
+     * @param appId                     The app identification of the merchant in Mercado Pago. Can not be null or empty.
+     * @param merchantBaseUrl           The merchant base url where the component will ask the access token of the logged user. Can not be null or empty.
+     * @param merchantGetCredentialsUri The merchant uri where the component will get the credentials. Can not be null or empty.
+     * @param userIdentificationToken   The user identification linked to the access token. Can be null or empty.
      */
     private static void startConnectActivity(Activity activity, String appId, String merchantBaseUrl, String merchantGetCredentialsUri, String userIdentificationToken) {
 
@@ -65,7 +65,7 @@ public class MPConnect {
         }
 
         /**
-         * Validate the parameters and start connect activity
+         * Validate parameters and start connect activity
          **/
         public void startConnectActivity() {
             if (this.mActivity == null) throw new IllegalStateException("activity is null");
