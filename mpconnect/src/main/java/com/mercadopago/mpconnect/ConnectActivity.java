@@ -30,7 +30,6 @@ public class ConnectActivity extends AppCompatActivity {
     //Local Ver Connect Mercado Pago
     private static final String mUrl = "https://www.mercadopago.com.ar/?code=";
     private static final String mRedirectUri = "https://www.mercadopago.com.ar";
-    private String mAuthCode;
     private AccessToken mAccessToken;
 
     //Parameters
@@ -47,12 +46,12 @@ public class ConnectActivity extends AppCompatActivity {
         getActivityParameters();
         initializeWebView();
 
-        mWebView.setWebViewClient(new WebViewClient(){
+        mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 if (url.contains(mUrl)) {
-                    setAuthCode(url);
-                    getPrivateKey();
+                    String authCode = getAuthCodeFromUrl(url);
+                    getPrivateKey(authCode);
                     return true;
                 }
                 return false;
@@ -75,16 +74,23 @@ public class ConnectActivity extends AppCompatActivity {
         mWebView.clearCache(true);
     }
 
+    private void getActivityParameters() {
+        mAppId = getIntent().getStringExtra("appId");
+        mMerchantBaseUrl = getIntent().getStringExtra("merchantBaseUrl");
+        mMerchantGetCredentialsUri = getIntent().getStringExtra("merchantGetCredentialsUri");
+        mUserIdentificationToken = getIntent().getStringExtra("userIdentificationToken");
+    }
+
     private void initializeWebView() {
         mWebView = (WebView) findViewById(R.id.webViewLib);
     }
 
-    private void setAuthCode(String url){
-        mAuthCode = url.substring(url.lastIndexOf("=")+1);
+    private String getAuthCodeFromUrl(String url) {
+        return url.substring(url.lastIndexOf("=") + 1);
     }
 
-    private void getPrivateKey() {
-        AuthCodeIntent authCodeIntent = createAuthCodeIntent();
+    private void getPrivateKey(String authCode) {
+        AuthCodeIntent authCodeIntent = new AuthCodeIntent(authCode, mRedirectUri, mUserIdentificationToken);
 
         Retrofit retrofitBuilder = new Retrofit.Builder()
                 .client(HttpClientUtil.getClient(this))
@@ -98,46 +104,25 @@ public class ConnectActivity extends AppCompatActivity {
         call.enqueue(new Callback<AccessToken>() {
             @Override
             public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
-                if(response.code() == 400) {
-                    Log.e("Failure","Error 400, parameter invalid");
-                    finishWithCancelResult();
-                }
-                else if (response.code() >= 200 && response.code() <= 300) {
+                if (response.code() >= 200 && response.code() <= 300) {
                     mAccessToken = response.body();
                     finishWithResult();
-                }
-                else {
+                } else {
                     finishWithCancelResult();
                 }
             }
 
             @Override
             public void onFailure(Call<AccessToken> call, Throwable t) {
-                Log.e("Failure","Service failure");
+                Log.e("Failure", "Service failure");
                 finishWithCancelResult();
             }
         });
     }
 
-    private AuthCodeIntent createAuthCodeIntent(){
-        AuthCodeIntent authCodeIntent = new AuthCodeIntent();
-        authCodeIntent.setAuthorizationCode(mAuthCode);
-        authCodeIntent.setRedirectUri(mRedirectUri);
-        authCodeIntent.setUserIdentificationToken(mUserIdentificationToken);
-
-        return authCodeIntent;
-    }
-
-    private void getActivityParameters(){
-        mAppId = getIntent().getStringExtra("appId");
-        mMerchantBaseUrl = getIntent().getStringExtra("merchantBaseUrl");
-        mMerchantGetCredentialsUri = getIntent().getStringExtra("merchantGetCredentialsUri");
-        mUserIdentificationToken = getIntent().getStringExtra("userIdentificationToken");
-    }
-
     private void finishWithResult() {
         Intent resultIntent = new Intent();
-        resultIntent.putExtra("accessToken",mAccessToken.getAccessToken());
+        resultIntent.putExtra("accessToken", mAccessToken.getAccessToken());
         this.setResult(RESULT_OK, resultIntent);
         this.finish();
     }
