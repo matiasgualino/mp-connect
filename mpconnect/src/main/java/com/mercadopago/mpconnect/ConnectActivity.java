@@ -5,11 +5,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 import com.mercadopago.mpconnect.model.AccessToken;
 import com.mercadopago.mpconnect.model.AuthCodeIntent;
@@ -24,8 +26,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ConnectActivity extends AppCompatActivity {
 
-    //Control
+    //Controls
     private WebView mWebView;
+    private ProgressBar mProgressbar;
 
     //Local Ver Connect Mercado Pago
     private static final String mUrl = "https://www.mercadopago.com.ar/?code=";
@@ -44,7 +47,10 @@ public class ConnectActivity extends AppCompatActivity {
         setContentView(R.layout.activity_mpconnect);
 
         getActivityParameters();
-        initializeWebView();
+        initializeControls();
+
+        mWebView.setVisibility(View.GONE);
+        mProgressbar.setVisibility(View.VISIBLE);
 
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
@@ -55,6 +61,12 @@ public class ConnectActivity extends AppCompatActivity {
                     return true;
                 }
                 return false;
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                mProgressbar.setVisibility(View.GONE);
+                mWebView.setVisibility(View.VISIBLE);
             }
         });
 
@@ -81,8 +93,9 @@ public class ConnectActivity extends AppCompatActivity {
         mUserIdentificationToken = getIntent().getStringExtra("userIdentificationToken");
     }
 
-    private void initializeWebView() {
+    private void initializeControls() {
         mWebView = (WebView) findViewById(R.id.webViewLib);
+        mProgressbar = (ProgressBar) findViewById(R.id.mpsdkProgressBar);
     }
 
     private String getAuthCodeFromUrl(String url) {
