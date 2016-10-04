@@ -8,7 +8,7 @@ You can start this component just like this code:
     new MPConnect.StartActivityBuilder()
             .setActivity(context)
             .setAppId("app_id")
-            .setMerchantBaseUrl("merchant_base_url")
+            .setMerchantBaseUrl("http://merchant_base_url")
             .setMerchantGetCredentialsUri("get_credentials_uri")
             .setUserIdentificationToken("user_identification_token")
             .startConnectActivity();
@@ -16,7 +16,7 @@ You can start this component just like this code:
 ```
 ***
 
-Then you can wait the result with this code:
+Then you can get the result with this code:
 
 ***
 ```java
