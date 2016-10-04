@@ -31,10 +31,8 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 accessToken = data.getStringExtra("accessToken");
                 Toast.makeText(MainActivity.this, "AccessToken: " + accessToken, Toast.LENGTH_SHORT).show();
-                this.finish();
-            } else {
-                this.finish();
             }
+            this.finish();
         }
     }
 }

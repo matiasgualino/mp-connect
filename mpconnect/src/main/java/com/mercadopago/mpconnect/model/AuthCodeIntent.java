@@ -8,23 +8,17 @@ import com.google.gson.annotations.SerializedName;
 public class AuthCodeIntent {
 
     @SerializedName("code")
-    private String mAuthorizationCode;
+    private String authorizationCode;
 
     @SerializedName("redirect_uri")
-    private String mRedirectUri;
+    private String redirectUri;
 
     @SerializedName("user_id_access_token")
-    private String mUserIdentificationToken;
+    private String userIdentificationToken;
 
-    public void setAuthorizationCode(String authorizationCode){
-        this.mAuthorizationCode = authorizationCode;
-    }
-
-    public void setRedirectUri(String redirectUri){
-        this.mRedirectUri = redirectUri;
-    }
-
-    public void setUserIdentificationToken(String userIdentificationToken){
-        this.mUserIdentificationToken = userIdentificationToken;
+    public AuthCodeIntent(String authCode, String redirectUri, String userIdentificationToken) {
+        this.authorizationCode = authCode;
+        this.redirectUri = redirectUri;
+        this.userIdentificationToken = userIdentificationToken;
     }
 }
