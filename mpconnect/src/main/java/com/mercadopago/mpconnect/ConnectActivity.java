@@ -51,7 +51,7 @@ public class ConnectActivity extends AppCompatActivity {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 if (url.contains(mUrl)) {
                     String authCode = getAuthCodeFromUrl(url);
-                    getPrivateKey(authCode);
+                    getAccessToken(authCode);
                     return true;
                 }
                 return false;
@@ -89,7 +89,7 @@ public class ConnectActivity extends AppCompatActivity {
         return url.substring(url.lastIndexOf("=") + 1);
     }
 
-    private void getPrivateKey(String authCode) {
+    private void getAccessToken(String authCode) {
         AuthCodeIntent authCodeIntent = new AuthCodeIntent(authCode, mRedirectUri, mUserIdentificationToken);
 
         Retrofit retrofitBuilder = new Retrofit.Builder()
