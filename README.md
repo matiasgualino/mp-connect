@@ -1,6 +1,6 @@
 ## Mercado Pago Connect
 
-This component let you login in a Mercado Pago account from an Android app.
+This component let you login in a Mercado Pago account from an Android app and get its access token.
 You can start this component just like this code:
 
 ***
