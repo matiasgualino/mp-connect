@@ -7,7 +7,7 @@ You can start this component just like this code:
 ```java
     new MPConnect.StartActivityBuilder()
             .setActivity(context)
-            .setAppId("app_id")
+            .setAppId("mercado_pago_app_id")
             .setMerchantBaseUrl("http://merchant_base_url")
             .setMerchantGetCredentialsUri("get_credentials_uri")
             .setUserIdentificationToken("user_identification_token")
