@@ -11,15 +11,18 @@ import static android.text.TextUtils.isEmpty;
 public class MPConnect {
 
     public static final int CONNECT_REQUEST_CODE = 0;
-
+    
     /**
      * Start the web view for log in to Mercado Pago account and get its access token.
+     * If base url is null, the credentials uri have to be null.
+     * If credentials uri is null, the base url have to be null.
+     * If both base url and credentials uri are null, this component will use Mercado Pago base url and credentials uri by default.
      *
      * @param activity                  Reference to Android Context. Can not be null or empty.
      * @param appId                     The app identification of the merchant in Mercado Pago. Can not be null or empty.
-     * @param merchantBaseUrl           The merchant base url where the component will ask the access token of the logged user. Can not be null or empty.
-     * @param merchantGetCredentialsUri The merchant uri where the component will get the credentials. Can not be null or empty.
-     * @param userIdentificationToken   The user identification linked to the access token. Can be null or empty.
+     * @param merchantBaseUrl           The merchant base url where the component will ask the access token of the logged user. It can be null.
+     * @param merchantGetCredentialsUri The merchant uri where the component will get the credentials. Can not be null or empty. It can be null.
+     * @param userIdentificationToken   The user identification linked to the access token. It can be null.
      */
     private static void startConnectActivity(Activity activity, String appId, String merchantBaseUrl, String merchantGetCredentialsUri, String userIdentificationToken) {
 
@@ -70,12 +73,17 @@ public class MPConnect {
         public void startConnectActivity() {
             if (this.mActivity == null) throw new IllegalStateException("activity is null");
             if (isEmpty(this.mAppId)) throw new IllegalStateException("app id is null or empty");
-            if (isEmpty(this.mMerchantBaseUrl))
-                throw new IllegalStateException("base url is null or empty");
-            if (isEmpty(this.mMerchantGetCredentialsUri))
-                throw new IllegalStateException("uri is null or empty");
+            if (isBaseUrlEmptyAndUriNotEmpty() || isCredentialsUriEmptyAndUrlNotEmpty()) throw new IllegalStateException("base url and credentials uri can not be null or empty");
 
             MPConnect.startConnectActivity(this.mActivity, this.mAppId, this.mMerchantBaseUrl, this.mMerchantGetCredentialsUri, this.mUserIdentificationToken);
+        }
+
+        private boolean isBaseUrlEmptyAndUriNotEmpty(){
+           return isEmpty(mMerchantBaseUrl) && !isEmpty(mMerchantGetCredentialsUri);
+        }
+
+        private boolean isCredentialsUriEmptyAndUrlNotEmpty(){
+            return !isEmpty(mMerchantBaseUrl) && isEmpty(mMerchantGetCredentialsUri);
         }
     }
 }

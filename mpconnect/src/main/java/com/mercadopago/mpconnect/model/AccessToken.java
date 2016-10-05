@@ -39,7 +39,7 @@ public class AccessToken {
         return this.mPublicKey;
     }
 
-    public String getmRefreshToken() {
+    public String getRefreshToken() {
         return this.mRefreshToken;
     }
 
@@ -61,5 +61,9 @@ public class AccessToken {
 
     public String getScope() {
         return this.mScope;
+    }
+
+    public void setAccessToken(String accessToken){
+        this.mAccessToken = accessToken;
     }
 }

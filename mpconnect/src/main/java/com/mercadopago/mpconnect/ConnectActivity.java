@@ -30,9 +30,11 @@ public class ConnectActivity extends AppCompatActivity {
     private WebView mWebView;
     private ProgressBar mProgressbar;
 
-    //Local Ver Connect Mercado Pago
-    private static final String mUrl = "https://www.mercadopago.com.ar/?code=";
-    private static final String mRedirectUri = "https://www.mercadopago.com.ar";
+    //Local
+    private static final String URL_WITH_AUTH_CODE = "https://www.mercadopago.com.ar/?code=";
+    private static final String REDIRECT_URI = "https://www.mercadopago.com.ar";
+    private static final String DEFAULT_BASE_URL = "http://mpconnect-wrapper.herokuapp.com/";
+    private static final String DEFAULT_CREDENTIALS_URI = "checkout/get_credentials";
     private AccessToken mAccessToken;
 
     //Parameters
@@ -55,7 +57,7 @@ public class ConnectActivity extends AppCompatActivity {
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.contains(mUrl)) {
+                if (url.contains(URL_WITH_AUTH_CODE)) {
                     String authCode = getAuthCodeFromUrl(url);
                     getAccessToken(authCode);
                     return true;
@@ -81,7 +83,7 @@ public class ConnectActivity extends AppCompatActivity {
             cookieManager.setAcceptThirdPartyCookies(mWebView, true);
         }
 
-        mWebView.loadUrl("https://auth.mercadopago.com.ar/authorization?client_id=" + mAppId + "&response_type=code&platform_id=mp&redirect_uri=" + mRedirectUri);
+        mWebView.loadUrl("https://auth.mercadopago.com.ar/authorization?client_id=" + mAppId + "&response_type=code&platform_id=mp&redirect_uri=" + REDIRECT_URI);
         cookieManager.removeAllCookie();
         mWebView.clearCache(true);
     }
@@ -91,6 +93,11 @@ public class ConnectActivity extends AppCompatActivity {
         mMerchantBaseUrl = getIntent().getStringExtra("merchantBaseUrl");
         mMerchantGetCredentialsUri = getIntent().getStringExtra("merchantGetCredentialsUri");
         mUserIdentificationToken = getIntent().getStringExtra("userIdentificationToken");
+
+        if (mMerchantBaseUrl == null || mMerchantGetCredentialsUri == null){
+            mMerchantBaseUrl = DEFAULT_BASE_URL;
+            mMerchantGetCredentialsUri = DEFAULT_CREDENTIALS_URI;
+        }
     }
 
     private void initializeControls() {
@@ -103,7 +110,7 @@ public class ConnectActivity extends AppCompatActivity {
     }
 
     private void getAccessToken(String authCode) {
-        AuthCodeIntent authCodeIntent = new AuthCodeIntent(authCode, mRedirectUri, mUserIdentificationToken);
+        AuthCodeIntent authCodeIntent = new AuthCodeIntent(authCode, REDIRECT_URI, mUserIdentificationToken);
 
         Retrofit retrofitBuilder = new Retrofit.Builder()
                 .client(HttpClientUtil.getClient(this))
