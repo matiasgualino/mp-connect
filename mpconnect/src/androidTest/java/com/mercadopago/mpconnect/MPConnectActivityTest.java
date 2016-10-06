@@ -9,13 +9,15 @@ import android.test.suitebuilder.annotation.LargeTest;
 import com.mercadopago.mpconnect.model.AccessToken;
 import com.mercadopago.mpconnect.test.FakeAPI;
 
-
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import static android.support.test.espresso.web.sugar.Web.onWebView;
+import static android.support.test.espresso.web.webdriver.DriverAtoms.findElement;
+import static android.support.test.espresso.web.webdriver.DriverAtoms.webKeys;
 
 /**
  * Created by mromar on 10/4/16.
@@ -25,7 +27,13 @@ import org.junit.runner.RunWith;
 public class MPConnectActivityTest {
 
     @Rule
-    public ActivityTestRule<ConnectActivity> mTestRule = new ActivityTestRule<>(ConnectActivity.class, true, false);
+    public ActivityTestRule<ConnectActivity> mTestRule = new ActivityTestRule<>(ConnectActivity.class, true, false){
+    @Override
+    protected void afterActivityLaunched() {
+        // Enable JS!
+        onWebView().forceJavascriptEnabled();
+    }
+};
     private Intent validStartIntent;
     private FakeAPI mFakeAPI;
     private boolean mIntentsActive;
@@ -71,7 +79,9 @@ public class MPConnectActivityTest {
 
         ConnectActivity connectActivity = mTestRule.launchActivity(validStartIntent);
 
-        //onWebView().withElement(findElement(android.support.test.espresso.web.webdriver.Locator.ID, ""));
+        onWebView().withElement(findElement(android.support.test.espresso.web.webdriver.Locator.ID, "user_id")).perform(webKeys("test_user_96694678@testuser.com"));
+        onWebView().withElement(findElement(android.support.test.espresso.web.webdriver.Locator.ID, "passwordFieldBox")).perform(webKeys("test_user_96694678@testuser.com"));
+        //onWebView().withElement(findElement(android.support.test.espresso.web.webdriver.Locator.ID, "signInButton")).perform(webClick());
     }
 
     private AccessToken getAccessToken(){

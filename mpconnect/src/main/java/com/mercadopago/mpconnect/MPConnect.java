@@ -11,7 +11,7 @@ import static android.text.TextUtils.isEmpty;
 public class MPConnect {
 
     public static final int CONNECT_REQUEST_CODE = 0;
-    
+
     /**
      * Start the web view for log in to Mercado Pago account and get its access token.
      * If base url is null, the credentials uri have to be null.
