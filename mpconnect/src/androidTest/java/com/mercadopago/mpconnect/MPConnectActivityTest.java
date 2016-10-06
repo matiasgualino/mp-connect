@@ -27,13 +27,7 @@ import static android.support.test.espresso.web.webdriver.DriverAtoms.webKeys;
 public class MPConnectActivityTest {
 
     @Rule
-    public ActivityTestRule<ConnectActivity> mTestRule = new ActivityTestRule<>(ConnectActivity.class, true, false){
-    @Override
-    protected void afterActivityLaunched() {
-        // Enable JS!
-        onWebView().forceJavascriptEnabled();
-    }
-};
+    public ActivityTestRule<ConnectActivity> mTestRule = new ActivityTestRule<>(ConnectActivity.class, true, false);
     private Intent validStartIntent;
     private FakeAPI mFakeAPI;
     private boolean mIntentsActive;

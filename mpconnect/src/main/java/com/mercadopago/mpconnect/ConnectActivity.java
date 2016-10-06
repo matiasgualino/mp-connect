@@ -33,8 +33,6 @@ public class ConnectActivity extends AppCompatActivity {
     //Local
     private static final String URL_WITH_AUTH_CODE = "https://www.mercadopago.com.ar/?code=";
     private static final String REDIRECT_URI = "https://www.mercadopago.com.ar";
-    private static final String DEFAULT_BASE_URL = "http://mpconnect-wrapper.herokuapp.com/";
-    private static final String DEFAULT_CREDENTIALS_URI = "checkout/get_credentials";
     private AccessToken mAccessToken;
 
     //Parameters
@@ -93,11 +91,6 @@ public class ConnectActivity extends AppCompatActivity {
         mMerchantBaseUrl = getIntent().getStringExtra("merchantBaseUrl");
         mMerchantGetCredentialsUri = getIntent().getStringExtra("merchantGetCredentialsUri");
         mUserIdentificationToken = getIntent().getStringExtra("userIdentificationToken");
-
-        if (mMerchantBaseUrl == null || mMerchantGetCredentialsUri == null){
-            mMerchantBaseUrl = DEFAULT_BASE_URL;
-            mMerchantGetCredentialsUri = DEFAULT_CREDENTIALS_URI;
-        }
     }
 
     private void initializeControls() {
