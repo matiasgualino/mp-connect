@@ -16,9 +16,9 @@ public class MainActivity extends AppCompatActivity {
 
         new MPConnect.StartActivityBuilder()
                 .setActivity(this)
-                .setAppId("3339632528347950")
-                .setMerchantBaseUrl("http://mpconnect-wrapper.herokuapp.com/")
-                .setMerchantGetCredentialsUri("checkout/get_credentials")
+                .setAppId("123456789101112")
+                .setMerchantBaseUrl("http://mpconnect-mercado-pago.com/")
+                .setMerchantGetCredentialsUri("credentials")
                 .setUserIdentificationToken("123456789")
                 .startConnectActivity();
     }
